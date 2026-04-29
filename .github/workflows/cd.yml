@@ -48,20 +48,20 @@ jobs:
       # 4. Docker 인증 설정
       - name: Docker Auth
         run: |
-          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+          gcloud auth configure-docker ${{ secrets.REGION }}-docker.pkg.dev
 
       # 5. Docker 이미지 빌드 및 푸시
       - name: Build and Push Image
         run: |
-          docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:latest .
-          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:latest
+          docker build -t ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/${{ secrets.IMAGE_NAME }}:latest .
+          docker push ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/${{ secrets.IMAGE_NAME }}:latest
 
       # 6. Cloud Run 배포 (모든 Secrets 주입)
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:latest \
-            --region ${{ env.REGION }} \
+          gcloud run deploy ${{ secrets.SERVICE_NAME }} \
+            --image ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/${{ secrets.IMAGE_NAME }}:latest \
+            --region ${{ secrets.REGION }} \
             --platform managed \
             --allow-unauthenticated \
             --set-env-vars "DB_URL=${{ secrets.DB_URL }},\
