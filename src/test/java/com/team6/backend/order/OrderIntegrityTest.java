@@ -2,7 +2,7 @@ package com.team6.backend.order;
 
 import com.team6.backend.address.domain.entity.Address;
 import com.team6.backend.address.domain.repository.AddressRepository;
-import com.team6.backend.address.presentation.dto.AddressRequest;
+import com.team6.backend.address.presentation.dto.request.AddressRequest; // 수정된 부분
 import com.team6.backend.area.domain.entity.Area;
 import com.team6.backend.area.domain.repository.AreaRepository;
 import com.team6.backend.auth.domain.repository.UserRepository;

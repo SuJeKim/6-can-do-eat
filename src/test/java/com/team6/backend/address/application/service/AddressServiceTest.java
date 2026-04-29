@@ -2,8 +2,9 @@ package com.team6.backend.address.application.service;
 
 import com.team6.backend.address.domain.entity.Address;
 import com.team6.backend.address.domain.repository.AddressRepository;
-import com.team6.backend.address.presentation.dto.AddressRequest;
-import com.team6.backend.address.presentation.dto.AddressResponse;
+import com.team6.backend.address.presentation.dto.request.AddressRequest;
+import com.team6.backend.address.presentation.dto.request.AddressUpdateRequest;
+import com.team6.backend.address.presentation.dto.response.AddressResponse;
 import com.team6.backend.global.infrastructure.config.security.util.SecurityUtils;
 import com.team6.backend.user.domain.entity.Role;
 import com.team6.backend.user.domain.entity.User;
@@ -120,5 +121,40 @@ class AddressServiceTest {
 
         // then
         assertThat(address.isDeleted()).isTrue();
+    }
+
+    @Test
+    @DisplayName("배송지 수정 성공 - 기본 배송지 여부는 변경되지 않음")
+    void updateAddress_Success() {
+        // given
+        AddressUpdateRequest request = new AddressUpdateRequest("경기도 성남시", "202호", "회사");
+        given(securityUtils.getCurrentUserRole()).willReturn(Role.CUSTOMER);
+        given(addressRepository.findById(adId)).willReturn(Optional.of(address));
+        given(securityUtils.getCurrentUserId()).willReturn(userId);
+
+        // when
+        AddressResponse response = addressService.updateAddress(adId, request);
+
+        // then
+        assertThat(response.getAddress()).isEqualTo("경기도 성남시");
+        assertThat(response.getDetail()).isEqualTo("202호");
+        assertThat(response.getAlias()).isEqualTo("회사");
+        assertThat(response.isDefault()).isFalse(); // 초기값 유지
+    }
+
+    @Test
+    @DisplayName("기본 배송지 설정 성공")
+    void updateDefault_Success() {
+        // given
+        given(securityUtils.getCurrentUserRole()).willReturn(Role.CUSTOMER);
+        given(securityUtils.getCurrentUserId()).willReturn(userId);
+        given(addressRepository.findById(adId)).willReturn(Optional.of(address));
+        given(addressRepository.findByUserIdAndIsDefaultTrue(userId)).willReturn(Optional.empty());
+
+        // when
+        AddressResponse response = addressService.updateDefault(adId, true); // Changed from UpdateDefault to updateDefault
+
+        // then
+        assertThat(response.isDefault()).isTrue();
     }
 }

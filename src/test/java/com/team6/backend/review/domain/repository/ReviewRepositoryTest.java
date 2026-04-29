@@ -2,7 +2,7 @@ package com.team6.backend.review.domain.repository;
 
 import com.team6.backend.address.domain.entity.Address;
 import com.team6.backend.address.domain.repository.AddressRepository;
-import com.team6.backend.address.presentation.dto.AddressRequest;
+import com.team6.backend.address.presentation.dto.request.AddressRequest;
 import com.team6.backend.area.domain.entity.Area;
 import com.team6.backend.area.domain.repository.AreaRepository;
 import com.team6.backend.category.domain.entity.Category;

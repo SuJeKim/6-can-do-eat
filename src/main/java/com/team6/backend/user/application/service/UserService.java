@@ -7,6 +7,7 @@ import com.team6.backend.global.infrastructure.exception.CommonErrorCode;
 import com.team6.backend.global.infrastructure.redis.RedisService;
 import com.team6.backend.user.domain.entity.Role;
 import com.team6.backend.user.domain.entity.User;
+import com.team6.backend.user.domain.exception.UserErrorCode;
 import com.team6.backend.user.domain.repository.UserInfoRepository;
 import com.team6.backend.user.presentation.dto.request.UserInfoRequest;
 import com.team6.backend.user.presentation.dto.response.UserInfoResponse;
@@ -74,9 +75,12 @@ public class UserService {
 
         // 3. 수정
         targetUser.updateUsername(request.getUsername());
-        if (request.getPassword() != null && !request.getPassword().isBlank()) {
-            targetUser.updatePassword(passwordEncoder.encode(request.getPassword()));
-        }
+
+        // 닉네임(username) 변경 및 검증
+        updateUsernameIfChanged(targetUser, request.getUsername());
+
+        // 비밀번호 변경 및 검증
+        updatePasswordIfProvided(targetUser, request.getPassword());
 
         return UserInfoResponse.from(targetUser);
     }
@@ -168,5 +172,38 @@ public class UserService {
         if (!currentUserRole.equals(Role.MASTER) && !userId.equals(currentUserId)) {
             throw new ApplicationException(CommonErrorCode.FORBIDDEN);
         }
+    }
+
+    /**
+     * 닉네임(username) 변경 시 중복 및 동일 여부 확인 후 변경
+     */
+    private void updateUsernameIfChanged(User targetUser, String newUsername) {
+        if (newUsername == null || newUsername.isBlank()) return;
+        
+        // 현재 이름과 동일한 경우
+        if (targetUser.getUsername().equals(newUsername)) {
+            return; // 변경하지 않음 (또는 필요시 에러 발생 가능)
+        }
+
+        // 다른 사용자가 사용 중인지 확인
+        if (userRepository.existsByUsername(newUsername)) {
+            throw new ApplicationException(UserErrorCode.DUPLICATE_USERNAME);
+        }
+        
+        targetUser.updateUsername(newUsername);
+    }
+
+    /**
+     * 비밀번호 변경 시 기존 비밀번호와 동일 여부 확인 후 변경
+     */
+    private void updatePasswordIfProvided(User targetUser, String newPassword) {
+        if (newPassword == null || newPassword.isBlank()) return;
+
+        // 기존 비밀번호와 동일한지 확인
+        if (passwordEncoder.matches(newPassword, targetUser.getPassword())) {
+            throw new ApplicationException(UserErrorCode.PASSWORD_ALREADY_IN_USE);
+        }
+
+        targetUser.updatePassword(passwordEncoder.encode(newPassword));
     }
 }

@@ -49,36 +49,36 @@ public class UserController {
     /**
      * 사용자 정보 수정 (닉네임, 비밀번호)
      */
-    @PutMapping("/{usernId}")
+    @PutMapping("/{userId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<SuccessResponse<UserInfoResponse>> updateUser(
-            @PathVariable UUID usernId,
+            @PathVariable UUID userId,
             @RequestBody UserInfoRequest request
     ) {
-        UserInfoResponse response = userService.updateUser(usernId, request);
+        UserInfoResponse response = userService.updateUser(userId, request);
         return ResponseEntity.ok(SuccessResponse.of(CommonSuccessCode.OK, "정보 수정이 완료되었습니다.", response));
     }
 
     /**
      * 사용자 권한 변경
      */
-    @PatchMapping("/{usernId}/role")
+    @PatchMapping("/{userId}/role")
     @PreAuthorize("hasRole('MASTER')")
     public ResponseEntity<SuccessResponse<UserInfoResponse>> updateUserRole(
-            @PathVariable UUID usernId,
+            @PathVariable UUID userId,
             @RequestBody UserInfoRequest request
     ) {
-        UserInfoResponse response = userService.updateUserRole(usernId, request.getRole());
+        UserInfoResponse response = userService.updateUserRole(userId, request.getRole());
         return ResponseEntity.ok(SuccessResponse.of(CommonSuccessCode.OK, "권한 변경이 완료되었습니다.", response));
     }
 
     /**
      * 사용자 삭제 (소프트)
      */
-    @DeleteMapping("/{usernId}")
+    @DeleteMapping("/{userId}")
     @PreAuthorize("hasAnyRole('MANAGER', 'MASTER')")
-    public ResponseEntity<SuccessResponse<Void>> deleteUser(@PathVariable UUID usernId) {
-        userService.deleteUser(usernId);
+    public ResponseEntity<SuccessResponse<Void>> deleteUser(@PathVariable UUID userId) {
+        userService.deleteUser(userId);
         return ResponseEntity.ok(SuccessResponse.of(CommonSuccessCode.OK, "사용자 삭제가 완료되었습니다.", null));
     }
 }

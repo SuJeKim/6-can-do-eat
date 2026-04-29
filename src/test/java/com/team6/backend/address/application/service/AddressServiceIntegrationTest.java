@@ -2,8 +2,8 @@
 //
 //import com.team6.backend.address.domain.entity.Address;
 //import com.team6.backend.address.domain.repository.AddressRepository;
-//import com.team6.backend.address.presentation.dto.AddressRequest;
-//import com.team6.backend.address.presentation.dto.AddressResponse;
+//import com.team6.backend.address.presentation.dto.request.AddressRequest;
+//import com.team6.backend.address.presentation.dto.response.AddressResponse;
 //import com.team6.backend.user.domain.entity.Role;
 //import com.team6.backend.user.domain.entity.User;
 //import com.team6.backend.user.domain.repository.userInfoRepository;

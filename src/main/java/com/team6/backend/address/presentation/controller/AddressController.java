@@ -1,8 +1,9 @@
 package com.team6.backend.address.presentation.controller;
 
 import com.team6.backend.address.application.service.AddressService;
-import com.team6.backend.address.presentation.dto.AddressRequest;
-import com.team6.backend.address.presentation.dto.AddressResponse;
+import com.team6.backend.address.presentation.dto.request.AddressRequest;
+import com.team6.backend.address.presentation.dto.response.AddressResponse;
+import com.team6.backend.address.presentation.dto.request.AddressUpdateRequest;
 import com.team6.backend.global.infrastructure.response.CommonSuccessCode;
 import com.team6.backend.global.infrastructure.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,7 @@ public class AddressController {
     /* 배송지 수정 */
     @PutMapping("/addresses/{adId}")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<SuccessResponse<AddressResponse>> updateAddress(@PathVariable UUID adId, @RequestBody AddressRequest request) {
+    public ResponseEntity<SuccessResponse<AddressResponse>> updateAddress(@PathVariable UUID adId, @RequestBody AddressUpdateRequest request) {
         AddressResponse response = addressService.updateAddress(adId, request);
         SuccessResponse<AddressResponse> successResponse = SuccessResponse.of(CommonSuccessCode.OK, "주소 정보 수정이 완료되었습니다.", response);
         return ResponseEntity.ok(successResponse);
@@ -74,8 +75,11 @@ public class AddressController {
     /* 기본 배송지 설정 */
     @PatchMapping("/addresses/{adId}/default")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<SuccessResponse<AddressResponse>> updateDefaultAddress(@PathVariable UUID adId) {
-        AddressResponse response = addressService.UpdateDefault(adId);
+    public ResponseEntity<SuccessResponse<AddressResponse>> updateDefaultAddress(
+            @PathVariable UUID adId,
+            @RequestParam(name = "default") boolean isDefault
+    ) {
+        AddressResponse response = addressService.updateDefault(adId, isDefault);
         SuccessResponse<AddressResponse> successResponse = SuccessResponse.of(CommonSuccessCode.OK, "기본 배송지 설정이 완료되었습니다.", response);
         return ResponseEntity.ok(successResponse);
     }

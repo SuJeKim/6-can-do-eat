@@ -1,7 +1,6 @@
-package com.team6.backend.address.presentation.dto;
+package com.team6.backend.address.presentation.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,16 +8,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddressRequest {
+public class AddressUpdateRequest {
 
     @NotBlank(message = "주소(address)는 필수 입력사항입니다")
     private String address;
 
     private String detail;
-
-    // TODO: JSON 필드명 불일치
-    @JsonProperty("isDefault")
-    private boolean isDefault;
 
     private String alias;
 

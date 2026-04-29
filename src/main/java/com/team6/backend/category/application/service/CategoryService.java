@@ -8,6 +8,7 @@ import com.team6.backend.global.infrastructure.config.security.util.SecurityUtil
 import com.team6.backend.global.infrastructure.exception.ApplicationException;
 import com.team6.backend.category.domain.exception.CategoryErrorCode;
 import com.team6.backend.global.infrastructure.util.AuthValidator;
+import com.team6.backend.store.domain.repository.StoreRepository;
 import com.team6.backend.user.domain.entity.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ import java.util.UUID;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final StoreRepository storeRepository;
     private final SecurityUtils securityUtils;
     private final AuthValidator authValidator;
 
@@ -100,6 +102,11 @@ public class CategoryService {
                 null,
                 CategoryErrorCode.CATEGORY_FORBIDDEN
         );
+
+        if (storeRepository.existsByCategory_CategoryId(categoryId)) {
+            log.warn("[CATEGORY] 카테고리 삭제 실패: 사용 중인 카테고리입니다. categoryId: {}", categoryId);
+            throw new ApplicationException(CategoryErrorCode.CATEGORY_IN_USE);
+        }
 
         Category category = findCategoryById(categoryId);
         category.markDeleted(securityUtils.getCurrentUserId().toString());

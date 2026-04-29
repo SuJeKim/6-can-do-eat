@@ -1,7 +1,7 @@
 package com.team6.backend.address.domain.entity;
 
-import aQute.bnd.annotation.metatype.Meta;
-import com.team6.backend.address.presentation.dto.AddressRequest;
+import com.team6.backend.address.presentation.dto.request.AddressRequest;
+import com.team6.backend.address.presentation.dto.request.AddressUpdateRequest;
 import com.team6.backend.global.infrastructure.entity.BaseEntity;
 import com.team6.backend.user.domain.entity.User;
 import jakarta.persistence.*;
@@ -42,21 +42,19 @@ public class Address extends BaseEntity {
     public Address(AddressRequest request, User user) {
         this.address = request.getAddress();
         this.detail = request.getDetail();
-        this.isDefault = false;
+        this.isDefault = request.isDefault();
         this.user = user;
         this.alias = request.getAlias();
     }
 
-    public void updateAddress(AddressRequest request) {
+    public void updateAddress(AddressUpdateRequest request) {
         this.address = request.getAddress();
         this.detail = request.getDetail();
-        this.isDefault = request.isDefault();
         this.alias = request.getAlias();
     }
 
-    // 어차피 값이 두개 밖에 없으니 dto갖고 오지 말자
-    public void updateDefault() {
-        this.isDefault = !this.isDefault;
+    public void updateDefault(boolean isDefault) {
+        this.isDefault = isDefault;
     }
 
 }

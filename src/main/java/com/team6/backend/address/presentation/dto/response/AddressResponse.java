@@ -1,4 +1,4 @@
-package com.team6.backend.address.presentation.dto;
+package com.team6.backend.address.presentation.dto.response;
 
 import com.team6.backend.address.domain.entity.Address;
 import lombok.AllArgsConstructor;

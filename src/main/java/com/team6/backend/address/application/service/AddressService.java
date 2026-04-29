@@ -2,8 +2,9 @@ package com.team6.backend.address.application.service;
 
 import com.team6.backend.address.domain.entity.Address;
 import com.team6.backend.address.domain.repository.AddressRepository;
-import com.team6.backend.address.presentation.dto.AddressRequest;
-import com.team6.backend.address.presentation.dto.AddressResponse;
+import com.team6.backend.address.presentation.dto.request.AddressRequest;
+import com.team6.backend.address.presentation.dto.response.AddressResponse;
+import com.team6.backend.address.presentation.dto.request.AddressUpdateRequest;
 import com.team6.backend.global.infrastructure.config.security.util.SecurityUtils;
 import com.team6.backend.global.infrastructure.exception.ApplicationException;
 import com.team6.backend.global.infrastructure.exception.CommonErrorCode;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -84,7 +86,7 @@ public class AddressService {
 
     // 배송지 수정: CUSTOMER 전용
     @Transactional
-    public AddressResponse updateAddress(UUID adId, AddressRequest request) {
+    public AddressResponse updateAddress(UUID adId, AddressUpdateRequest request) {
         validateRole(Role.CUSTOMER);
         Address address = findById(adId);
         address.updateAddress(request);
@@ -93,11 +95,23 @@ public class AddressService {
 
     // 기본 배송지 설정: CUSTOMER 전용
     @Transactional
-    public AddressResponse UpdateDefault(UUID adId) {
+    public AddressResponse updateDefault(UUID adId, boolean isDefault) {
         validateRole(Role.CUSTOMER);
-        Address address = findById(adId);
-        address.updateDefault();
-        return new AddressResponse(address);
+        UUID currentUserId = securityUtils.getCurrentUserId();
+        Address addressToUpdate = findById(adId);
+
+        // 같을 경우 못 바꾸게
+        if (isDefault) {
+            Optional<Address> currentDefaultAddress = addressRepository.findByUserIdAndIsDefaultTrue(currentUserId);
+            currentDefaultAddress.ifPresent(addr -> {
+                if (!addr.getAdId().equals(adId)) { // Ensure it's not the same address
+                    addr.updateDefault(false);
+                }
+            });
+        }
+        
+        addressToUpdate.updateDefault(isDefault);
+        return new AddressResponse(addressToUpdate);
     }
 
     // 공통 역할 검증 메서드

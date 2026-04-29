@@ -8,6 +8,7 @@ import com.team6.backend.global.infrastructure.config.security.util.SecurityUtil
 import com.team6.backend.global.infrastructure.exception.ApplicationException;
 import com.team6.backend.category.domain.exception.CategoryErrorCode;
 import com.team6.backend.global.infrastructure.util.AuthValidator;
+import com.team6.backend.store.domain.repository.StoreRepository;
 import com.team6.backend.user.domain.entity.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.verify;
 class CategoryServiceTest {
 
     @Mock private CategoryRepository categoryRepository;
+    @Mock private StoreRepository storeRepository;
     @Mock private SecurityUtils securityUtils;
     @Mock private AuthValidator authValidator;
 
@@ -146,6 +148,21 @@ class CategoryServiceTest {
         assertThatThrownBy(() -> categoryService.deleteCategory(id))
                 .isInstanceOf(ApplicationException.class)
                 .hasMessage(CategoryErrorCode.CATEGORY_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("카테고리 삭제 실패 - 이미 사용 중인 카테고리 (400)")
+    void deleteCategory_Fail_WhenCategoryIsInUse() {
+        // given
+        UUID categoryId = UUID.randomUUID();
+        given(storeRepository.existsByCategory_CategoryId(categoryId)).willReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> categoryService.deleteCategory(categoryId))
+                .isInstanceOf(ApplicationException.class)
+                .hasMessageContaining(CategoryErrorCode.CATEGORY_IN_USE.getMessage());
+
+        verify(storeRepository).existsByCategory_CategoryId(categoryId);
     }
 
 }
